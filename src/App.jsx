@@ -1,49 +1,53 @@
-import { useState } from "react";
+
+import React, { useState } from "react";
 import "./App.css";
 
 function App() {
-  const [task, setTask] = useState("");
-  const [taskList, setTaskList] = useState([]);
-  const [editId, setEditId] = useState(null);
+  const [taskInput, setTaskInput] = useState("");
+  const [todoItems, setTodoItems] = useState([]);
+  const [editingTaskId, setEditingTaskId] = useState(null);
 
   const addTask = () => {
-    if (task.trim() === "") {
+    if (taskInput.trim() === "") {
       alert("Please enter a task");
       return;
     }
-    if (editId !== null) {
-      const updatedList = taskList.map((item) => item.id === editId ? { ...item, name: task } : item);
-      setTaskList(updatedList);
-      setEditId(null);
+
+    if (editingTaskId !== null) {
+      const updatedList = todoItems.map((item) => item.id === editingTaskId ? { ...item, name: taskInput } : item);
+      setTodoItems(updatedList);
+      setEditingTaskId(null);
     } else {
-      const newTask = { id: Date.now(), name: task, completed: false };
-      setTaskList([...taskList, newTask]);
+      const newTask = { id: Date.now(), name: taskInput, completed: false };
+      setTodoItems([...todoItems, newTask]);
     }
-    setTask("");
+
+    setTaskInput("");
   };
 
   const editTask = (id) => {
-    const selectedTask = taskList.find((item) => item.id === id);
-    setTask(selectedTask.name);
-    setEditId(id);
+    const selectedTask = todoItems.find((item) => item.id === id);
+    setTaskInput(selectedTask.name);
+    setEditingTaskId(id);
   };
 
   const deleteTask = (id) => {
-    const updatedList = taskList.filter((item) => item.id !== id);
-    setTaskList(updatedList);
-    if (editId === id) {
-      setEditId(null);
-      setTask("");
+    const updatedList = todoItems.filter((item) => item.id !== id);
+    setTodoItems(updatedList);
+
+    if (editingTaskId === id) {
+      setEditingTaskId(null);
+      setTaskInput("");
     }
   };
 
   const completeTask = (id) => {
-    const updatedList = taskList.map((item) => item.id === id ? { ...item, completed: !item.completed } : item);
-    setTaskList(updatedList);
+    const updatedList = todoItems.map((item) => item.id === id ? { ...item, completed: !item.completed } : item);
+    setTodoItems(updatedList);
   };
 
-  const completedCount = taskList.filter((item) => item.completed).length;
-  const pendingCount = taskList.length - completedCount;
+  const completedCount = todoItems.filter((item) => item.completed).length;
+  const pendingCount = todoItems.length - completedCount;
 
   return (
     <div className="main-container">
@@ -51,7 +55,7 @@ function App() {
         <h1>My Daily Tasks</h1>
         <div className="count-box">
           <p>Total Tasks</p>
-          <h2>{taskList.length}</h2>
+          <h2>{todoItems.length}</h2>
         </div>
         <div className="count-box">
           <p>Completed Tasks</p>
@@ -65,15 +69,15 @@ function App() {
       <div className="right-section">
         <h2>My Todo List</h2>
         <div className="input-box">
-          <input type="text" placeholder="Enter your task..." value={task} onChange={(e) => setTask(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") addTask(); }} />
-          <button onClick={addTask}>{editId !== null ? "Update Task" : "Add Task"}</button>
+          <input type="text" placeholder="Enter your task..." value={taskInput} onChange={(e) => setTaskInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") addTask(); }} />
+          <button onClick={addTask}>{editingTaskId !== null ? "Update Task" : "Add Task"}</button>
         </div>
         <h3 className="list-heading">Your Tasks</h3>
         <div className="task-list">
-          {taskList.length === 0 ? (
+          {todoItems.length === 0 ? (
             <p className="empty-text">No tasks added yet.</p>
           ) : (
-            taskList.map((item) => (
+            todoItems.map((item) => (
               <div className="task-item" key={item.id}>
                 <div className="task-left">
                   <input type="checkbox" checked={item.completed} onChange={() => completeTask(item.id)} />
